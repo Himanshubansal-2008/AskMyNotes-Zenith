@@ -274,7 +274,7 @@ const SubjectPage = () => {
 
     return (
         <div className="subject-page" style={{ '--accent': accentColor, '--light': lightColor }}>
-            {/* Header */}
+            {}
             <header className="subject-header">
                 <div>
                     <Link to="/dashboard" className="back-btn">
@@ -300,7 +300,7 @@ const SubjectPage = () => {
                     </button>
                     <button
                         className="tab-btn"
-                        style={activeTab === 'chat' ? { background: 'rgba(255,255,255,0.08)', color: 'white', borderColor: 'var(--glass-border)' } : {}}
+                        style={activeTab === 'chat' ? { background: 'rgba(255,255,255,0.08)', color: 'blue', borderColor: 'var(--glass-border)' } : {}}
                         onClick={() => setActiveTab('chat')}
                     >
                         Chat
