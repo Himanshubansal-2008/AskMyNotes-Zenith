@@ -1,0 +1,70 @@
+.setup-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.08), transparent 50%),
+        radial-gradient(circle at bottom left, rgba(168, 85, 247, 0.08), transparent 50%);
+}
+
+.setup-card {
+    background: var(--bg-card);
+    padding: 4rem 3.5rem;
+    border-radius: 32px;
+    border: 1px solid var(--glass-border);
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+}
+
+.setup-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.setup-icon {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.setup-card h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.setup-header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.setup-form .input-group {
+    margin-bottom: 1.75rem;
+}
+
+.setup-form label {
+    display: block;
+    margin-bottom: 0.625rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.setup-form input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    padding: 1rem 1.25rem;
+    border-radius: 14px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.setup-form input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.08);
+}

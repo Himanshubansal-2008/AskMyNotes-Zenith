@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg-dark: #020617;
+    --bg-card: #0f172a;
+    --bg-sidebar: #000000;
+    --primary: #6366f1;
+    --primary-glow: rgba(99, 102, 241, 0.4);
+    --secondary: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    --glass: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --chat-max-width: 850px;
+
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    overflow-x: hidden;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Typography ─── */
+h1,
+h2,
+h3,
+h4 {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.01em;
+}
+
+.gradient-text {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ─── Buttons ─── */
+.btn-primary {
+    background: var(--gradient);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    filter: brightness(1.1);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    padding: 0.625rem 1.25rem;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-outline:hover {
+    border-color: white;
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-full {
+    width: 100%;
+}
+
+/* ─── Misc ─── */
+.spin {
+    animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    background: var(--bg-dark);
+    color: var(--text-muted);
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.hidden-file-input {
+    display: none;
+}
