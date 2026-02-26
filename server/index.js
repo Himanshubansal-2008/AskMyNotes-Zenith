@@ -35,14 +35,19 @@ const allowedOrigins = [
     'http://localhost:3000',
     'https://vedam-hack.vercel.app',
     process.env.CLIENT_URL,
-].filter(Boolean);
+]
+    .filter(Boolean)
+    .map(o => o.replace(/\/$/, '')); // strip trailing slashes
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (mobile apps, curl, Postman)
-        if (!origin || allowedOrigins.includes(origin)) {
+        // Allow requests with no origin (mobile apps, curl, Postman, Render health checks)
+        if (!origin) return callback(null, true);
+        const normalised = origin.replace(/\/$/, '');
+        if (allowedOrigins.includes(normalised)) {
             callback(null, true);
         } else {
+            console.warn(`CORS blocked origin: ${origin}`);
             callback(new Error(`CORS blocked: ${origin}`));
         }
     },
