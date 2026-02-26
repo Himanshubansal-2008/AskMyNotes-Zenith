@@ -5,7 +5,7 @@ import {
     ArrowLeft, FileUp, Send, BookOpen, Sparkles,
     CheckCircle, AlertCircle, FileText, Loader2,
     BookMarked, ChevronRight, RotateCcw, PanelLeftClose,
-    PanelRightClose, X, Maximize2
+    PanelRightClose, X, Maximize2, Mic, MicOff, Volume2, VolumeX
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -35,8 +35,57 @@ const SubjectPage = () => {
     const [realSubjectId, setRealSubjectId] = useState(null); // DB UUID after first upload
     const [showFileSidebar, setShowFileSidebar] = useState(false);
     const [previewNote, setPreviewNote] = useState(null);
+    const [isRecording, setIsRecording] = useState(false);
+    const [isSpeakingEnabled, setIsSpeakingEnabled] = useState(true);
+    const recognitionRef = useRef(null);
     const fileInputRef = useRef(null);
     const chatEndRef = useRef(null);
+    const synthRef = useRef(window.speechSynthesis);
+
+    useEffect(() => {
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new window.webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.ononstart = () => setIsRecording(true);
+            recognition.onend = () => setIsRecording(false);
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                setIsRecording(false);
+            };
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                setInput(transcript);
+                // Proactively send if needed, but for now just fill input
+            };
+
+            recognitionRef.current = recognition;
+        }
+    }, []);
+
+    const toggleRecording = () => {
+        if (!recognitionRef.current) {
+            alert("Speech recognition isn't supported in this browser.");
+            return;
+        }
+        if (isRecording) {
+            recognitionRef.current.stop();
+        } else {
+            recognitionRef.current.start();
+        }
+    };
+
+    const speakText = (text) => {
+        if (!isSpeakingEnabled || !synthRef.current) return;
+        // Clean text (remove markdown etc)
+        const cleanText = text.replace(/[*_#`]/g, '').replace(/\[.*?\]\(.*?\)/g, '');
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        synthRef.current.speak(utterance);
+    };
 
     // Load subject and history from API
     useEffect(() => {
@@ -146,7 +195,9 @@ const SubjectPage = () => {
                 clerkId: user?.id,
                 subjectName: subject?.name,
             });
-            setMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
+            const answer = data.answer;
+            setMessages(prev => [...prev, { role: 'assistant', content: answer }]);
+            speakText(answer);
         } catch (err) {
             const msg = err?.response?.data?.error || 'Server unreachable — ensure the backend is running on port 5001.';
             setMessages(prev => [...prev, { role: 'assistant', content: `⚠️ ${msg}` }]);
@@ -304,10 +355,27 @@ const SubjectPage = () => {
                                 </div>
 
                                 <div className="chat-input-row">
+                                    <div className="voice-controls">
+                                        <button
+                                            className={`voice-btn ${isRecording ? 'recording' : ''}`}
+                                            onClick={toggleRecording}
+                                            title={isRecording ? "Stop Recording" : "Start Voice Chat"}
+                                        >
+                                            {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+                                            {isRecording && <span className="pulse-ring"></span>}
+                                        </button>
+                                        <button
+                                            className="voice-btn"
+                                            onClick={() => setIsSpeakingEnabled(!isSpeakingEnabled)}
+                                            title={isSpeakingEnabled ? "Mute AI Voice" : "Unmute AI Voice"}
+                                        >
+                                            {isSpeakingEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                                        </button>
+                                    </div>
                                     <div className="input-container">
                                         <input
                                             type="text"
-                                            placeholder={`Message ${subject.name} Copilot...`}
+                                            placeholder={isRecording ? "Listening..." : `Message ${subject.name} Copilot...`}
                                             value={input}
                                             onChange={e => setInput(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && sendMessage()}

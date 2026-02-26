@@ -196,18 +196,36 @@ app.post('/api/ai/ask', async (req, res) => {
             return res.json({ answer: `Not found in your notes for ${subjectName}. Please upload some notes first.` });
         }
 
+        const history = await prisma.chatMessage.findMany({
+            where: { subjectId: subject.id },
+            orderBy: { createdAt: 'desc' },
+            take: 10
+        });
+        const historyContext = history.reverse().map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n');
+
         const context = notes.map(n => `[File: ${n.filename}]\n${n.content}`).join('\n\n---\n\n');
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-        const prompt = `You are a study assistant. Answer the student's question using ONLY the provided notes.
-If the answer is not in the notes, respond with: "Not found in your notes for this subject."
-Always cite the source file if possible.
+        const prompt = `You are a supportive, teacher-like study assistant named "Study Copilot". 
+Your goal is to explain concepts clearly and conversationally.
+Answer the student's question using ONLY the provided notes.
+If the answer is not in the notes, respond with: "Not found in your notes for ${subjectName}. Would you like to upload more material?"
+
+CONSTRAINTS:
+1. Ground answers in the notes.
+2. Use a helpful, encouraging tone.
+3. Reference the source file name.
+4. If it's a follow-up question, use the recent history to stay in context.
+
+RECENT HISTORY:
+${historyContext}
 
 NOTES:
 ${context.substring(0, 30000)}
 
 QUESTION: ${question}
 
-Provide: Answer, Confidence (High/Medium/Low), Source reference.`;
+Provide your response in a conversational way. 
+Include: The Answer (with citations), Confidence: [High/Medium/Low]`;
 
         const result = await model.generateContent(prompt);
         const answer = result.response.text();
