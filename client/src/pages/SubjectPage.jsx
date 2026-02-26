@@ -37,6 +37,7 @@ const SubjectPage = () => {
     const [previewNote, setPreviewNote] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
     const [isSpeakingEnabled, setIsSpeakingEnabled] = useState(true);
+    const [isSpeaking, setIsSpeaking] = useState(false);
     const recognitionRef = useRef(null);
     const fileInputRef = useRef(null);
     const chatEndRef = useRef(null);
@@ -49,7 +50,7 @@ const SubjectPage = () => {
             recognition.interimResults = false;
             recognition.lang = 'en-US';
 
-            recognition.ononstart = () => setIsRecording(true);
+            recognition.onstart = () => setIsRecording(true);
             recognition.onend = () => setIsRecording(false);
             recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
@@ -57,8 +58,9 @@ const SubjectPage = () => {
             };
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
-                setInput(transcript);
-                // Proactively send if needed, but for now just fill input
+                if (transcript.trim()) {
+                    setInput(transcript);
+                }
             };
 
             recognitionRef.current = recognition;
@@ -79,12 +81,26 @@ const SubjectPage = () => {
 
     const speakText = (text) => {
         if (!isSpeakingEnabled || !synthRef.current) return;
-        // Clean text (remove markdown etc)
+        synthRef.current.cancel(); // Stop any pending speech
         const cleanText = text.replace(/[*_#`]/g, '').replace(/\[.*?\]\(.*?\)/g, '');
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.rate = 1.0;
         utterance.pitch = 1.0;
+
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+
         synthRef.current.speak(utterance);
+    };
+
+    const toggleSpeaking = () => {
+        if (isSpeaking) {
+            synthRef.current.cancel();
+            setIsSpeaking(false);
+        } else {
+            setIsSpeakingEnabled(!isSpeakingEnabled);
+        }
     };
 
     // Load subject and history from API
@@ -365,11 +381,12 @@ const SubjectPage = () => {
                                             {isRecording && <span className="pulse-ring"></span>}
                                         </button>
                                         <button
-                                            className="voice-btn"
-                                            onClick={() => setIsSpeakingEnabled(!isSpeakingEnabled)}
-                                            title={isSpeakingEnabled ? "Mute AI Voice" : "Unmute AI Voice"}
+                                            className={`voice-btn ${isSpeaking ? 'active-audio' : ''}`}
+                                            onClick={toggleSpeaking}
+                                            title={isSpeaking ? "Stop Audio" : (isSpeakingEnabled ? "Mute AI Voice" : "Unmute AI Voice")}
                                         >
-                                            {isSpeakingEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                                            {isSpeakingEnabled ? (isSpeaking ? <Volume2 className="speaking-anim" size={20} /> : <Volume2 size={20} />) : <VolumeX size={20} />}
+                                            {isSpeaking && <span className="audio-wave"></span>}
                                         </button>
                                     </div>
                                     <div className="input-container">

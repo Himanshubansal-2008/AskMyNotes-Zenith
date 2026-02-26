@@ -424,10 +424,65 @@
     color: var(--text-main);
 }
 
+.voice-btn.active-audio {
+    background: #0673f9;
+    border-color: #0673f9;
+    color: white !important;
+    box-shadow: 0 0 15px rgba(6, 115, 249, 0.4);
+}
+
+.speaking-anim {
+    animation: bounce 0.5s ease infinite alternate;
+}
+
+@keyframes bounce {
+    from {
+        transform: scale(0.9);
+    }
+
+    to {
+        transform: scale(1.1);
+    }
+}
+
+.audio-wave {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 4px;
+    background: #0673f9;
+    border-radius: 2px;
+    animation: wave-breath 1.2s ease-in-out infinite;
+}
+
+@keyframes wave-breath {
+
+    0%,
+    100% {
+        transform: translateX(-50%) scaleX(1);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: translateX(-50%) scaleX(1.5);
+        opacity: 1;
+    }
+}
+
 .voice-btn.recording {
-    background: rgba(239, 68, 68, 0.1);
+    background: #000000 !important;
     border-color: #ef4444;
-    color: #ef4444;
+    color: #ffffff !important;
+    transform: scale(1.1);
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+    z-index: 10;
+}
+
+.light-mode .voice-btn.recording {
+    background: #000000 !important;
+    color: #ffffff !important;
 }
 
 .pulse-ring {
